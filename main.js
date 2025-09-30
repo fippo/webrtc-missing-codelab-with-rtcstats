@@ -142,7 +142,7 @@ const codecPreferences = document.querySelector('#codecPreferences');
 const supportsSetCodecPreferences = window.RTCRtpTransceiver &&
   'setCodecPreferences' in window.RTCRtpTransceiver.prototype;
 if (supportsSetCodecPreferences && codecPreferences) {
-    const {codecs} = RTCRtpSender.getCapabilities('video');
+    const {codecs} = RTCRtpReceiver.getCapabilities('video');
     codecs.forEach(codec => {
         if (['video/red', 'video/ulpfec', 'video/rtx'].includes(codec.mimeType)) {
             return;
@@ -203,9 +203,6 @@ function connect() {
             case 'hello':
                 clientId = data.id;
                 document.getElementById('clientId').innerText = clientId;
-                // Set the url hash (#) to the client id. This allows simple copy-paste
-                // of the url to another tab.
-                window.location.hash = clientId;
                 break;
             case 'iceServers':
                 iceServers = data.iceServers;
@@ -473,7 +470,7 @@ async function call(id) {
         const preferredCodec = codecPreferences.options[codecPreferences.selectedIndex];
         if (preferredCodec.value !== '') {
             const [mimeType, sdpFmtpLine] = preferredCodec.value.split(' ');
-            const {codecs} = RTCRtpSender.getCapabilities('video');
+            const {codecs} = RTCRtpReceiver.getCapabilities('video');
             const selectedCodecIndex = codecs.findIndex(c => c.mimeType === mimeType && c.sdpFmtpLine === sdpFmtpLine);
             const selectedCodec = codecs[selectedCodecIndex];
             codecs.slice(selectedCodecIndex, 1);
@@ -530,8 +527,9 @@ function hangup(id) {
         type: 'bye',
         id,
     }));
-    if (codecPreferences)
-        codecPreferences.disabled = !supportSetCodecPreferences;
+    if (codecPreferences) {
+        codecPreferences.disabled = !supportsSetCodecPreferences;
+    }
 }
 
 window.addEventListener('beforeunload', () => {
@@ -545,16 +543,18 @@ window.addEventListener('beforeunload', () => {
 // Instantiate an RTCStats trace function with the defaults.
 const trace = wrapRTCStatsWithDefaultOptions();
 
-// Autoconnect when given a peer id, i.e. #someid
-const initialHash = window.location.hash.substr(1);
-
 // Get the camera, then connect to signaling. Makes things simple.
-getUserMedia()
-  .then((/*stream*/) => {
-    return connect();
-})
-.then(() => {
-    if (initialHash.length) {
-        call(initialHash);
-    }
+getUserMedia().then((/*stream*/) => {
+   return connect();
 });
+
+const callBtn = document.getElementById('callButton');
+callBtn.addEventListener('click', () => {
+    call(document.getElementById('peerId').value);
+    callBtn.disabled = true;
+});
+
+offerCallback = (id) => { // Setting this disables autoanswer behaviour
+    document.getElementById('peerId').value = id;
+    answer(id);
+};

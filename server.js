@@ -27,7 +27,7 @@ server.on('listening', () => {
 });
 server.on('request', (request, response) => {
     const urlToPath = {
-        '/': 'static/index.html',
+        '/': 'static/no-autodial.html',
         '/no-autodial': 'static/no-autodial.html',
         '/main.js': 'dist/main.js',
         '/main.css': 'static/main.css',
