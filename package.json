@@ -13,7 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@rtcstats/rtcstats-js": "^1.1.0",
+    "@rtcstats/rtcstats-js": "^1.1.1",
     "twilio": "^5.10.1",
     "uuid": "^3.4.0",
     "webpack-cli": "^6.0.1",

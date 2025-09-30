@@ -183,9 +183,6 @@ function connect() {
             // wait until we have received the iceServers message.
             // resolve();
             console.log('websocket opened');
-
-            // Connect to the rtcstats-server instance.
-            trace.connect('wss://clownfish-stats-uk8td.ondigitalocean.app' + window.location.pathname);
         });
         ws.addEventListener('error', (e) => {
             console.log('websocket error, is the server running?', e);
@@ -290,6 +287,11 @@ function connect() {
                     console.log('Peer not found', data.id);
                 }
                 break;
+            case 'rtcstats':
+                // Connect to the rtcstats-server instance.
+                trace.connect(data.url + window.location.pathname + '?rtcstats-token=' + data.token);
+                break;
+
             default:
                 console.log('Unhandled', data);
                 break;

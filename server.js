@@ -3,6 +3,7 @@ const http = require('http');
 
 const WebSocket = require('ws');
 const uuid = require('uuid');
+const jwt = require('jsonwebtoken');
 
 // Twilio bits, following https://www.twilio.com/docs/stun-turn
 // and taking the account details from the environment as
@@ -88,6 +89,27 @@ wss.on('connection', (ws) => {
         type: 'hello',
         id,
     }));
+
+    // Send a rtcstats token.
+    if (process.env.RTCSTATS_JWT_SECRET && process.env.RTCSTATS_URL) {
+        jwt.sign({
+            rtcStats: {
+                user: id,
+                session: id,
+                conference: '',
+            },
+        }, process.env.RTCSTATS_JWT_SECRET, {expiresIn: 60/* seconds */}, (err, token) => {
+            if (err) {
+                console.error('JWT generation failed', err);
+                return;
+            }
+            ws.send(JSON.stringify({
+                type: 'rtcstats',
+                token,
+                url: process.env.RTCSTATS_URL,
+            }));
+        });
+    }
 
     // Send an ice server configuration to the client. For stun this is synchronous,
     // for TURN it might require getting credentials.
