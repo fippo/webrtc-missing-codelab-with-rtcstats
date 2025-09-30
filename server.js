@@ -29,12 +29,14 @@ server.on('request', (request, response) => {
         '/': 'static/index.html',
         '/no-autodial': 'static/no-autodial.html',
         '/main.js': 'static/main.js',
+        '/rtcstats.js': 'dist/main.js',
         '/main.css': 'static/main.css',
     };
     const urlToContentType = {
         '/': 'text/html',
         '/no-autodial': 'text/html',
         '/main.js': 'application/javascript',
+        '/rtcstats.js': 'application/javascript',
         '/main.css': 'text/css',
     };
     const filename = urlToPath[request.url];
