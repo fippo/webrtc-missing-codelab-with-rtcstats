@@ -28,8 +28,7 @@ server.on('request', (request, response) => {
     const urlToPath = {
         '/': 'static/index.html',
         '/no-autodial': 'static/no-autodial.html',
-        '/main.js': 'static/main.js',
-        '/rtcstats.js': 'dist/main.js',
+        '/main.js': 'dist/main.js',
         '/main.css': 'static/main.css',
     };
     const urlToContentType = {

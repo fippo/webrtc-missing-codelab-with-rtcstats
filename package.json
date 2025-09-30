@@ -8,13 +8,12 @@
     "Tsahi Levent-Levi"
   ],
   "scripts": {
-    "start": "webpack ./rtcstats.js && node server.js",
+    "start": "webpack --no-devtool ./main.js && node server.js",
     "test": "eslint *.js static/*.html"
   },
   "license": "MIT",
   "dependencies": {
-    "@rtcstats/rtcstats-js": "^1.0.0",
-    "@rtcstats/rtcstats-shared": "^1.0.0",
+    "@rtcstats/rtcstats-js": "^1.1.0",
     "twilio": "^5.10.1",
     "uuid": "^3.4.0",
     "webpack-cli": "^6.0.1",

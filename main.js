@@ -1,3 +1,5 @@
+import {wrapRTCStatsWithDefaultOptions} from '@rtcstats/rtcstats-js';
+
 // When offerCallback is set, don't auto-answer incoming calls.
 let offerCallback = null;
 
@@ -181,6 +183,9 @@ function connect() {
             // wait until we have received the iceServers message.
             // resolve();
             console.log('websocket opened');
+
+            // Connect to the rtcstats-server instance.
+            trace.connect('wss://clownfish-stats-uk8td.ondigitalocean.app' + window.location.pathname);
         });
         ws.addEventListener('error', (e) => {
             console.log('websocket error, is the server running?', e);
@@ -532,5 +537,22 @@ window.addEventListener('beforeunload', () => {
         peers.forEach((pc, id) => {
             hangup(id);
         });
+    }
+});
+
+// Instantiate an RTCStats trace function with the defaults.
+const trace = wrapRTCStatsWithDefaultOptions();
+
+// Autoconnect when given a peer id, i.e. #someid
+const initialHash = window.location.hash.substr(1);
+
+// Get the camera, then connect to signaling. Makes things simple.
+getUserMedia()
+  .then((/*stream*/) => {
+    return connect();
+})
+.then(() => {
+    if (initialHash.length) {
+        call(initialHash);
     }
 });

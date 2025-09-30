@@ -38,22 +38,5 @@
             </p>
         </div>
     </div>
-    <script src="/rtcstats.js"></script>
     <script src="/main.js"></script>
-    <script>
-/* globals getUserMedia, connect, call */
-// Autoconnect when given a peer id, i.e. #someid
-const initialHash = window.location.hash.substr(1);
-
-// Get the camera, then connect to signaling. Makes things simple.
-getUserMedia()
-  .then((/*stream*/) => {
-    return connect();
-})
-.then(() => {
-    if (initialHash.length) {
-        call(initialHash);
-    }
-});
-    </script>
 </body>
