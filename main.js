@@ -144,7 +144,7 @@ const supportsSetCodecPreferences = window.RTCRtpTransceiver &&
 if (supportsSetCodecPreferences && codecPreferences) {
     const {codecs} = RTCRtpReceiver.getCapabilities('video');
     codecs.forEach(codec => {
-        if (['video/red', 'video/ulpfec', 'video/rtx'].includes(codec.mimeType)) {
+        if (['video/red', 'video/ulpfec', 'video/rtx', 'video/flexfec-03'].includes(codec.mimeType)) {
             return;
         }
         const option = document.createElement('option');

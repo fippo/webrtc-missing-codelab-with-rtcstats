@@ -50,6 +50,11 @@ button {
     color: white;
 }
 
+button:disabled {
+    color: black;
+    background-color: rgb(51, 146, 108);
+}
+
 body {
     background-image: url("https://bloggeek.me/wp-content/uploads/2020/02/bloggeekme.png");
     background-position: right bottom;
