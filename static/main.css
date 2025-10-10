@@ -50,6 +50,12 @@ button {
     color: white;
 }
 
+#copyBtn {
+	padding: 0px !important;
+	padding: 0px 5px !important;
+    margin-left: 10px;
+}
+
 button:disabled {
     color: black;
     background-color: rgb(51, 146, 108);

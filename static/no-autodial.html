@@ -4,16 +4,19 @@
     <link rel="stylesheet" href="/main.css"/>
 </head>
 <body>
+    <div>Note: works best in Chrome 142+ with --force-fieldtrials=WebRTC-RFC8888CongestionControlFeedback/Enabled,offer:true/</div>
     <div class="container">
         <div class="videocontainer left">
             <video id="localVideo" autoplay muted playsinline></video>
+            <div id="localStats"></div>
         </div>
         <div class="videocontainer right">
             <div id="connectionState">&#x1f4f6;</div>
             <video id="remoteVideo" autoplay playsinline></video>
+            <div id="remoteStats"></div>
         </div>
         <div class="left">
-            <p>Client ID: <span id="clientId"></span></p>
+            <p>Client ID: <span id="clientId"></span><button id="copyBtn">copy</button></p>
             <p>
                 <button id="audioBtn">mute audio</button>
                 <button id="videoBtn">mute video</button>

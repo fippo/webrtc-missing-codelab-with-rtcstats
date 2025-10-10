@@ -97,6 +97,11 @@ shareBtn.addEventListener('click', async () => {
     // changed our video source.
 });
 
+const copyBtn = document.getElementById('copyBtn');
+copyBtn.onclick = () => {
+    navigator.clipboard.writeText(document.getElementById('clientId').innerText);
+};
+
 // When clicking the hangup button, any connections will be closed.
 const hangupBtn = document.getElementById('hangupButton');
 hangupBtn.addEventListener('click', () => {
@@ -383,7 +388,7 @@ function createPeerConnection(id) {
             clearInterval(intervalId);
             return;
         }
-        lastResult = await queryBitrateStats(pc, lastResult);
+        lastResult = await queryL4SStats(pc, lastResult);
     }, 2000);
     peers.set(id, pc);
     return pc;
@@ -419,35 +424,32 @@ function onConnectionStats(results) {
   }
 }
 
-async function queryBitrateStats(pc, lastResult) {
-    const sender = pc.getSenders().find(s => s.track && s.track.kind === 'video');
-    if (!sender) {
-        return;
-    }
-    const stats = await sender.getStats();
+async function queryL4SStats(pc, lastResult) {
+    const stats = await pc.getStats();
+    document.getElementById('localStats').innerText = '';
+    document.getElementById('remoteStats').innerText = '';
     stats.forEach(report => {
       if (report.type === 'outbound-rtp') {
-        if (report.isRemote) {
-          return;
-        }
         const now = report.timestamp;
-        const bytes = report.bytesSent;
-        const headerBytes = report.headerBytesSent;
-
-        const packets = report.packetsSent;
+        const packets = report.packetsSentWithEct1;
         if (lastResult && lastResult.has(report.id)) {
-          // calculate bitrate
-          const bitrate = Math.floor(8 * (bytes - lastResult.get(report.id).bytesSent) /
+          const packetrate = Math.floor(1000 * (packets - lastResult.get(report.id).packetsSentWithEct1) /
             (now - lastResult.get(report.id).timestamp));
-          const headerrate = Math.floor(8 * (headerBytes - lastResult.get(report.id).headerBytesSent) /
+          document.getElementById('localStats').innerText +=
+              report.kind + ' packets sent with ECT1 ' + packets + ' (' + packetrate + '/s)\n';
+        }
+      } else if (report.type === 'inbound-rtp') {
+        const now = report.timestamp;
+        const ect1 = report.packetsReceivedWithEct1;
+        const ce = report.packetsReceivedWithCe;
+        if (lastResult && lastResult.has(report.id)) {
+          const packetrate_ect1 = Math.floor(1000 * (ect1 - lastResult.get(report.id).packetsReceivedWithEct1) /
             (now - lastResult.get(report.id).timestamp));
-
-          const packetrate = Math.floor(1000 * (packets - lastResult.get(report.id).packetsSent) /
+          const packetrate_ce = Math.floor(1000 * (ce - lastResult.get(report.id).packetsReceivedWithCe) /
             (now - lastResult.get(report.id).timestamp));
-          console.log(`Bitrate ${bitrate}kbps, overhead ${headerrate}kbps, ${packetrate} packets/second`);
-
-          // We use the title attribute as a built-in tooltip.
-          connectionState.title = `Bitrate ${bitrate}kbps, overhead ${headerrate}kbps, ${packetrate} packets/second`;
+          document.getElementById('remoteStats').innerText +=
+              report.kind + ' packets received with ECT1 ' + ect1 + ' (' + packetrate_ect1 + '/s)\n' +
+              report.kind + ' packets received with CE ' + ce + ' (' + packetrate_ce + '/s)\n';
         }
       }
     });
