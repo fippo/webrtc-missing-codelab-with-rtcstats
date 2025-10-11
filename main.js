@@ -437,7 +437,7 @@ async function queryL4SStats(pc, lastResult) {
           const packetrate = Math.floor(1000 * (packets - lastResult.get(report.id).packetsSentWithEct1) /
             (now - lastResult.get(report.id).timestamp));
           document.getElementById('localStats').innerText +=
-              report.kind + ' packets sent with ECT1 ' + packets + ' (' + packetrate + '/s)\n';
+              report.kind + ' ' + report.ssrc +  ' packets sent with ECT1 ' + packets + ' (' + packetrate + '/s)\n';
         }
       } else if (report.type === 'inbound-rtp') {
         const now = report.timestamp;
@@ -449,9 +449,21 @@ async function queryL4SStats(pc, lastResult) {
           const packetrate_ce = Math.floor(1000 * (ce - lastResult.get(report.id).packetsReceivedWithCe) /
             (now - lastResult.get(report.id).timestamp));
           document.getElementById('remoteStats').innerText +=
-              report.kind + ' packets received with ECT1 ' + ect1 + ' (' + packetrate_ect1 + '/s)\n' +
-              report.kind + ' packets received with CE ' + ce + ' (' + packetrate_ce + '/s)\n';
+              report.kind + ' ' + report.ssrc + ' packets received with ECT1 ' + ect1 + ' (' + packetrate_ect1 + '/s)\n' +
+              report.kind + ' ' + report.ssrc + ' packets received with CE ' + ce + ' (' + packetrate_ce + '/s)\n';
         }
+      } else if (report.type === 'transport') {
+        const pair = stats.get(report.selectedCandidatePairId);
+        const local = stats.get(pair.localCandidateId);
+        const remote = stats.get(pair.remoteCandidateId);
+        document.getElementById('localStats').innerText +=
+            'Sending from local port ' + local.port;
+        if (local.relayProtocol) {
+          document.getElementById('localStats').innerText +=
+              ' relayProtocol ' + local.relayProtocol + ' server ' + local.url;
+        }
+        document.getElementById('remoteStats').innerText +=
+            'Receiving from remote port ' + remote.port;
       }
     });
     return stats;
