@@ -170,6 +170,7 @@ let clientId; // our client id.
 let ws; // our websocket.
 let localStream; // local stream to be acquired from getUserMedia.
 let iceServers = null; // the latest iceServers we got from the signaling server.
+window.iceTransportPolicy = undefined; // Can be set to 'relay' to force TURN.
 
 async function getUserMedia() {
     const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: true});
@@ -305,7 +306,7 @@ function connect() {
 // Helper function to create a peerconnection and set up a couple of useful
 // event listeners.
 function createPeerConnection(id) {
-    const pc = new RTCPeerConnection({iceServers});
+    const pc = new RTCPeerConnection({iceServers, iceTransportPolicy});
     let signalledCandidates = false;
     pc.addEventListener('icecandidate', (e) => {
         const {candidate} = e;

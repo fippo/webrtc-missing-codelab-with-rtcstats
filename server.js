@@ -1,18 +1,23 @@
-const fs = require('fs');
-const http = require('http');
+const fs = require('node:fs');
+const http = require('node:http');
+const crypto = require('node:crypto');
 
 const WebSocket = require('ws');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 
-// Twilio bits, following https://www.twilio.com/docs/stun-turn
-// and taking the account details from the environment as
-// security BCP.
-const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
-const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-let twilio;
-if (twilioAccountSid && twilioAuthToken) {
-    twilio = require('twilio')(twilioAccountSid, twilioAuthToken);
+function getTURNCredentials(name, secret){
+    const unixTimeStamp = parseInt(Date.now()/1000) + 1 * 3600;   // this credential would be valid for the next hour
+    const username = [unixTimeStamp, name].join(':');
+    const hmac = crypto.createHmac('sha1', secret);
+    hmac.setEncoding('base64');
+    hmac.write(username);
+    hmac.end();
+    const credential = hmac.read();
+    return {
+        username,
+        credential,
+    };
 }
 
 const port = 8080;
@@ -113,13 +118,13 @@ wss.on('connection', (ws) => {
 
     // Send an ice server configuration to the client. For stun this is synchronous,
     // for TURN it might require getting credentials.
-    if (twilio) {
-        twilio.tokens.create().then(token => {
+    if (process.env.TURN_URL && process.env.TURN_SECRET) {
+            const turn = getTURNCredentials(id, process.env.TURN_SECRET);
+            turn.urls = process.env.TURN_URL;
             ws.send(JSON.stringify({
                 type: 'iceServers',
-                iceServers: token.iceServers,
+                iceServers: [turn],
             }));
-        });
     } else {
         ws.send(JSON.stringify({
             type: 'iceServers',
