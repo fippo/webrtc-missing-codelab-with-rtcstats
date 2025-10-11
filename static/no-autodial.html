@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="/main.css"/>
 </head>
 <body>
-    <div>Note: works best in Chrome 142+ with --force-fieldtrials=WebRTC-RFC8888CongestionControlFeedback/Enabled,offer:true/</div>
     <div class="container">
         <div class="videocontainer left">
             <video id="localVideo" autoplay muted playsinline></video>
@@ -48,6 +47,11 @@
                 <button id="hangupButton" disabled>hangup</button>
             </p>
         </div>
+    </div>
+    <div>
+        <p>Note: works best in Chrome 142+ with --force-fieldtrials=WebRTC-RFC8888CongestionControlFeedback/Enabled,offer:true/WebRTC-Bwe-ScreamV2/Enabled/</p>
+        <p>In Chrome Beta/Canary use --disable-webrtc-encryption to see the RTCP packets directly in Wireshark without going via RTP dump export.</p>
+        <p>Set `iceTransportPolicy: 'relay'` in the JS console to force coturn usage</p>
     </div>
     <script src="/main.js"></script>
 </body>
