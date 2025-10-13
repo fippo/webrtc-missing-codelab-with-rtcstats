@@ -426,9 +426,21 @@ function onConnectionStats(results) {
 }
 
 async function queryL4SStats(pc, lastResult) {
-    const stats = await pc.getStats();
     document.getElementById('localStats').innerText = '';
     document.getElementById('remoteStats').innerText = '';
+    if (pc.localDescription && pc.remoteDescription) {
+        const answer = pc.localDescription.type === 'answer'
+            ? pc.localDescription.sdp
+            : pc.remoteDescription.sdp;
+        const sections = adapter.sdp.getMediaSections(answer);
+        const parameters = adapter.sdp.parseRtpParameters(sections[0]);
+        const codec = parameters.codecs[0];
+        if (!codec.rtcpFeedback.find(fb => fb.type === 'ack' && fb.parameter === 'ccfb')) {
+            document.getElementById('localStats').innerText += 'ccfb not negotiated\n';
+            document.getElementById('remoteStats').innerText += 'ccfb not negotiated\n';
+        }
+    }
+    const stats = await pc.getStats();
     stats.forEach(report => {
       if (report.type === 'outbound-rtp') {
         const now = report.timestamp;

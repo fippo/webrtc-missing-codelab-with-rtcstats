@@ -34,6 +34,10 @@ video {
     transform: scale(-1, 1);
 }
 
+#localStats, #remoteStats {
+    height: 90px;
+}
+
 #connectionState {
     position: absolute;
     right: 2px;
