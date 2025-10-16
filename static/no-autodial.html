@@ -49,9 +49,14 @@
         </div>
     </div>
     <div>
-        <p>Note: works best in Chrome 142+ with --force-fieldtrials=WebRTC-RFC8888CongestionControlFeedback/Enabled,offer:true/WebRTC-Bwe-ScreamV2/Enabled/</p>
+        <p>Note: works best in Chrome 143+ with --force-fieldtrials=WebRTC-RFC8888CongestionControlFeedback/Enabled,offer:true/WebRTC-Bwe-ScreamV2/Enabled/</p>
         <p>In Chrome Beta/Canary use --disable-webrtc-encryption to see the RTCP packets directly in Wireshark without going via RTP dump export.</p>
         <p>Set `iceTransportPolicy: 'relay'` in the JS console to force coturn usage</p>
+        <p>Known bugs:
+          <ul>
+            <li>ECN does not work on Windows.</li>
+          </ul>
+        </p>
         <p>Find the source code on github <a href="https://github.com/fippo/webrtc-missing-codelab-with-rtcstats">here</a>.
     </div>
     <script src="/main.js"></script>
