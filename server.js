@@ -120,7 +120,7 @@ wss.on('connection', (ws) => {
     // for TURN it might require getting credentials.
     if (process.env.TURN_URL && process.env.TURN_SECRET) {
             const turn = getTURNCredentials(id, process.env.TURN_SECRET);
-            turn.urls = process.env.TURN_URL;
+            turn.urls = process.env.TURN_URL.split(',');
             ws.send(JSON.stringify({
                 type: 'iceServers',
                 iceServers: [turn],
