@@ -128,7 +128,7 @@ wss.on('connection', (ws) => {
     } else {
         ws.send(JSON.stringify({
             type: 'iceServers',
-            iceServers: [{urls: 'stun:stun.l.google.com:19302'}],
+            iceServers: [{urls: ['stun:stun.l.google.com:19302']}],
         }));
     }
 

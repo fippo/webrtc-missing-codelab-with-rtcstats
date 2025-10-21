@@ -10,6 +10,11 @@ const remoteMetadata = new Map();
 // serialization.
 const localMetadata = {};
 
+// Allow filtering of relay candidates.
+// Set to "udp" to drop non-udp candidates,
+// "tcp" to drop non-tcp candidates.
+window.filterRelay = undefined;
+
 // Whether to use trickle-ice which is the default,
 // making call setup faster.
 const useTrickleIce = true;
@@ -265,6 +270,19 @@ function connect() {
                     hangupBtn.disabled = false;
                 } else {
                     console.log('Subsequent offer not implemented');
+                    // Ice restart
+                    const pc = peers.get(data.id);
+                    await pc.setRemoteDescription({
+                        type: data.type,
+                        sdp: data.sdp
+                    });
+                    await pc.setLocalDescription();
+                    ws.send(JSON.stringify({
+                        type: 'answer',
+                        sdp: pc.localDescription.sdp,
+                        id: data.id,
+                        metadata: localMetadata, // metadata, full and not incremental.
+                    }));
                 }
                 break;
             case 'answer':
@@ -307,6 +325,7 @@ function connect() {
 function createPeerConnection(id) {
     let iceTransportPolicy = document.getElementById('forceturn').checked ? 'relay' : undefined;
     const pc = new RTCPeerConnection({iceServers, iceTransportPolicy});
+    maybeFilterIceServers(pc);
     let signalledCandidates = false;
     pc.addEventListener('icecandidate', (e) => {
         const {candidate} = e;
@@ -373,6 +392,7 @@ function createPeerConnection(id) {
         console.log(id, 'connectionstatechange', pc.connectionState);
         if (pc.connectionState === 'connected') {
             hangupBtn.disabled = false;
+            document.getElementById('iceRestart').disabled = false;
             pc.getStats().then(onConnectionStats);
         }
     });
@@ -419,9 +439,7 @@ function onConnectionStats(results) {
   }
   if (remoteCandidate) {
     // Statistics are a bit of a mess still...
-    console.log('Remote is',
-        remoteCandidate.address || remoteCandidate.ip || remoteCandidate.ipAddress,
-        remoteCandidate.port || remoteCandidate.portNumber);
+    console.log('Remote is', remoteCandidate.address, remoteCandidate.port);
   }
 }
 
@@ -521,9 +539,45 @@ async function call(id) {
     document.getElementById('peerId').innerText = id;
 }
 
+function maybeFilterIceServers(pc) {
+    const config = pc.getConfiguration();
+    config.iceServers = structuredClone(iceServers);
+    if (filterRelay) {
+        config.iceServers.forEach(iceServer => {
+            iceServer.urls = iceServer.urls.filter(url => {
+                return url.indexOf(filterRelay) !== -1;
+            });
+        });
+        console.log('Filtering ICE servers from', iceServers, config.iceServers);
+    }
+    if (document.getElementById('forceturn').checked) {
+        config.iceTransportPolicy = 'relay';
+    }
+    pc.setConfiguration(config);
+}
+
+document.getElementById('iceRestart').addEventListener('click', async () => {
+    const id = document.getElementById('peerId').value;
+    if (!peers.has(id)) {
+        console.log('peer not found for restart', id);
+        return;
+    }
+    const pc = peers.get(id);
+    maybeFilterIceServers(pc);
+    console.log('Doing an ICE restart');
+    pc.restartIce();
+    await pc.setLocalDescription();
+    ws.send(JSON.stringify({
+        type: 'offer',
+        sdp: pc.localDescription.sdp,
+        id,
+        metadata: localMetadata,
+    }));
+});
+
 async function answer(id) {
     if (!peers.has(id)) {
-        console.log('can not answer, no peer with', id);
+        console.log('can not find existing session for ice restart', id);
         return;
     }
     const pc = peers.get(id);
