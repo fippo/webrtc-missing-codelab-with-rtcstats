@@ -177,7 +177,7 @@ let localStream; // local stream to be acquired from getUserMedia.
 let iceServers = null; // the latest iceServers we got from the signaling server.
 
 async function getUserMedia() {
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: true});
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: {width: 1280, height: 720}});
     document.getElementById('localVideo').srcObject = stream;
     localStream = stream;
     // Associate metadata with the stream id.
@@ -438,7 +438,6 @@ function onConnectionStats(results) {
     remoteCandidate = results.get(activeCandidatePair.remoteCandidateId);
   }
   if (remoteCandidate) {
-    // Statistics are a bit of a mess still...
     console.log('Remote is', remoteCandidate.address, remoteCandidate.port);
   }
 }

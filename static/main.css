@@ -1,6 +1,6 @@
 .container {
     margin: 0 auto 0 auto;
-    max-width: 60em;
+    max-width: 2 * 1280px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: 10px;
@@ -26,16 +26,18 @@
 }
 
 video {
-    height: 480px;
-    width: 640px;
+    height: 720px;
+    width: 1280px;
 }
 
 #localVideo {
+    height: 320px;
+    width: 640px;
     transform: scale(-1, 1);
 }
 
 #localStats, #remoteStats {
-    height: 90px;
+    height: 120px;
 }
 
 #connectionState {
