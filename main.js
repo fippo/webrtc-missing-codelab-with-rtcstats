@@ -486,13 +486,13 @@ async function queryL4SStats(pc, lastResult) {
         const local = stats.get(pair.localCandidateId);
         const remote = stats.get(pair.remoteCandidateId);
         document.getElementById('localStats').innerText +=
-            'Sending from local port ' + local.port;
+            'Sending from local port ' + local.port + ' type ' + local.candidateType;
         if (local.relayProtocol) {
           document.getElementById('localStats').innerText +=
               ' relayProtocol ' + local.relayProtocol + ' server ' + local.url;
         }
         document.getElementById('remoteStats').innerText +=
-            'Receiving from remote port ' + remote.port;
+            'Receiving from remote port ' + remote.port + ' type ' + remote.candidateType;
       }
     });
     return stats;
@@ -549,9 +549,7 @@ function maybeFilterIceServers(pc) {
         });
         console.log('Filtering ICE servers from', iceServers, config.iceServers);
     }
-    if (document.getElementById('forceturn').checked) {
-        config.iceTransportPolicy = 'relay';
-    }
+    config.iceTransportPolicy = document.getElementById('forceturn').checked ? 'relay' : 'all';
     pc.setConfiguration(config);
 }
 
@@ -638,3 +636,5 @@ offerCallback = (id) => { // Setting this disables autoanswer behaviour
     document.getElementById('peerId').value = id;
     answer(id);
 };
+
+document.getElementById('browserVersion').innerText  = 'Detected ' + adapter.browserDetails.browser + ' ' + adapter.browserDetails.version;

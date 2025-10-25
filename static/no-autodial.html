@@ -51,7 +51,6 @@
             <p>Peer ID: <input id="peerId" placeholder="whom to call" size=40></input></p>
             <p>
                 <button id="callButton">call</button>
-                <button id="answerButton" disabled>answer</button>
                 <button id="hangupButton" disabled>hangup</button>
             </p>
             <p>
@@ -60,12 +59,13 @@
         </div>
     </div>
     <div>
+        <p id="browserVersion"></p>
         <p>Note: works best in Chrome 143+ with <code>--force-fieldtrials=WebRTC-RFC8888CongestionControlFeedback/Enabled,offer:true/WebRTC-Bwe-ScreamV2/Enabled/</code></p>
         <p>In Chrome Beta/Canary use --disable-webrtc-encryption to see the RTCP packets directly in Wireshark without going via RTP dump export.</p>
         <p>Known bugs:
           <ul>
             <li>ECN does not work on Windows.</li>
-            <li>When using TURN Chrome/libWebRTC removes the ECN bit (if forwarded by the TURN server), see <a href="https://issues.webrtc.org/issues/42225697#comment104">here</a>.</li>
+            <li>FIXED: when using TURN Chrome/libWebRTC removes the ECN bit (if forwarded by the TURN server), see <a href="https://issues.webrtc.org/issues/42225697#comment104">here</a>.</li>
           </ul>
         </p>
         <p>Find the source code on github <a href="https://github.com/fippo/webrtc-missing-codelab-with-rtcstats">here</a>.
