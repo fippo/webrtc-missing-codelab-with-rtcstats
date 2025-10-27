@@ -472,6 +472,8 @@ async function queryL4SStats(pc, lastResult) {
         const now = report.timestamp;
         const ect1 = report.packetsReceivedWithEct1;
         const ce = report.packetsReceivedWithCe;
+        const lost = report.packetsReportedAsLost;
+        const recovered = report.packetsReportedAsLostButRecovered;
         if (lastResult && lastResult.has(report.id)) {
           const packetrate_ect1 = Math.floor(1000 * (ect1 - lastResult.get(report.id).packetsReceivedWithEct1) /
             (now - lastResult.get(report.id).timestamp));
@@ -479,7 +481,8 @@ async function queryL4SStats(pc, lastResult) {
             (now - lastResult.get(report.id).timestamp));
           document.getElementById('remoteStats').innerText +=
               report.kind + ' ssrc=' + report.ssrc + ' packets received with ECT1 ' + ect1 + ' (' + packetrate_ect1 + '/s)\n' +
-              report.kind + ' ssrc=' + report.ssrc + ' packets received with CE ' + ce + ' (' + packetrate_ce + '/s)\n';
+              report.kind + ' ssrc=' + report.ssrc + ' packets received with CE ' + ce + ' (' + packetrate_ce + '/s)\n' +
+              report.kind + ' ssrc=' + report.ssrc + ' packets reported as lost ' + lost + ', recovered ' + recovered + '\n';
         }
       } else if (report.type === 'transport') {
         const pair = stats.get(report.selectedCandidatePairId);
