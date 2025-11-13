@@ -484,6 +484,15 @@ async function queryL4SStats(pc, lastResult) {
               report.kind + ' ssrc=' + report.ssrc + ' packets received with CE ' + ce + ' (' + packetrate_ce + '/s)\n' +
               report.kind + ' ssrc=' + report.ssrc + ' packets reported as lost ' + lost + ', recovered ' + recovered + '\n';
         }
+      } else if (report.type === 'remote-inbound-rtp') {
+        const now = report.timestamp;
+        const bleached = report.packetsWithBleachedEct1Marking;
+        if (lastResult && lastResult.has(report.id)) {
+          const packetrate_bleached = Math.floor(1000 * (bleached - lastResult.get(report.id).packetsWithBleachedEct1Marking) /
+            (now - lastResult.get(report.id).timestamp));
+          document.getElementById('remoteStats').innerText +=
+              report.kind + ' ssrc=' + report.ssrc + ' packets with bleached ECT1 ' + bleached + ' (' + packetrate_bleached + '/s)\n';
+        }
       } else if (report.type === 'transport') {
         const pair = stats.get(report.selectedCandidatePairId);
         const local = stats.get(pair.localCandidateId);
