@@ -37,7 +37,7 @@ video {
 }
 
 #localStats, #remoteStats {
-    height: 160px;
+    height: 180px;
 }
 
 #connectionState {
