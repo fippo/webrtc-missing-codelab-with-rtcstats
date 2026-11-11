@@ -20,7 +20,7 @@ function getTURNCredentials(name, secret){
     };
 }
 
-const port = 8080;
+const port = 8081;
  
 // We use a HTTP server for serving static pages. In the real world you'll
 // want to separate the signaling server and how you serve the HTML/JS, the
@@ -102,6 +102,7 @@ wss.on('connection', (ws) => {
                 user: id,
                 session: id,
                 conference: '',
+                tags: ['l4s'],
             },
         }, process.env.RTCSTATS_JWT_SECRET, {expiresIn: 60/* seconds */}, (err, token) => {
             if (err) {
